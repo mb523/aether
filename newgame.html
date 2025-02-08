@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catch My Heart 💖</title>
+    <style>
+        body {
+            text-align: center;
+            background: linear-gradient(to bottom, #FFD1DC, #FFB6C1);
+        }
+        canvas {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Catch the Hearts <3</h1>
+    <canvas id="gameCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = 600;
+        canvas.height = 400;
+
+        // Load images
+        const heartImg = new Image();
+        heartImg.src = "heart.jpg"; // Add a heart image (40x40px recommended)
+
+        const basketImg = new Image();
+        basketImg.src = "basket.jpg"; // Add a basket image
+
+        // Game variables
+        let basketX = canvas.width / 2 - 40;
+        const basketY = canvas.height - 60;
+        const basketSpeed = 7;
+
+        let hearts = [];
+        let score = 0;
+        let gameOver = false;
+
+        // Function to spawn hearts
+        function spawnHeart() {
+            const x = Math.random() * (canvas.width - 40);
+            hearts.push({ x, y: 0 });
+        }
+
+        // Function to update the game
+        function update() {
+            if (Math.random() < 0.02) {
+                spawnHeart();
+            }
+
+            // Move hearts
+            hearts.forEach((heart, index) => {
+                heart.y += 3;
+                if (heart.y > canvas.height) {
+                    hearts.splice(index, 1);
+                }
+
+                // Check collision with basket
+                if (
+                    heart.x > basketX &&
+                    heart.x < basketX + 80 &&
+                    heart.y > basketY - 20 &&
+                    heart.y < basketY + 50
+                ) {
+                    hearts.splice(index, 1);
+                    score++;
+                }
+            });
+
+            // Win condition
+            if (score >= 10) {
+                gameOver = true;
+            }
+        }
+
+        // Function to draw everything
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw hearts
+            hearts.forEach((heart) => {
+                ctx.drawImage(heartImg, heart.x, heart.y, 40, 40);
+            });
+
+            // Draw basket
+            ctx.drawImage(basketImg, basketX, basketY, 80, 50);
+
+            // Draw score
+            ctx.fillStyle = "red";
+            ctx.font = "20px Arial";
+            ctx.fillText(`Score: ${score}`, 10, 30);
+
+            if (gameOver) {
+                ctx.fillText("i love you!! ❤️", canvas.width / 2 - 80, canvas.height / 2);
+            }
+        }
+
+        // Function to handle key events
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "ArrowLeft" && basketX > 0) {
+                basketX -= basketSpeed;
+            }
+            if (event.key === "ArrowRight" && basketX < canvas.width - 80) {
+                basketX += basketSpeed;
+            }
+        });
+
+        // Game loop
+        function gameLoop() {
+            update();
+            draw();
+            if (!gameOver) {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        // Start the game
+        gameLoop();
+    </script>
+</body>
+</html>
